@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileUp, Network, ShieldCheck } from 'lucide-react';
+import { Share2, Link as LinkIcon, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -10,17 +10,14 @@ export default function Home() {
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 text-center">
           <div className="container px-4 md:px-6">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none text-foreground">
-              SocketFileTransfer
+              SimpleShare
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl mt-4">
-              Securely and efficiently transfer files directly to any machine using a TCP socket connection.
+              Securely and efficiently share files with anyone, anywhere, using a simple link.
             </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row justify-center">
               <Button asChild size="lg">
-                <Link href="/dashboard">Get Started</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/setup">View Setup Guide</Link>
+                <Link href="/dashboard">Share a File</Link>
               </Button>
             </div>
           </div>
@@ -29,21 +26,21 @@ export default function Home() {
         <section id="features" className="w-full py-12 md:py-24 bg-muted/50">
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-headline font-bold tracking-tighter text-center mb-10">
-              Features
+              How It Works
             </h2>
             <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-3">
               <Card className="text-center">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <div className="p-4 bg-primary/10 rounded-full">
-                      <FileUp className="w-8 h-8 text-primary" />
+                      <Share2 className="w-8 h-8 text-primary" />
                     </div>
                   </div>
-                  <CardTitle className="font-headline">Direct File Transfer</CardTitle>
+                  <CardTitle className="font-headline">1. Upload Your File</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Send files from your browser directly to a remote host with our Python receiver script.
+                    Select any file from your device. We'll handle the upload process for you.
                   </p>
                 </CardContent>
               </Card>
@@ -51,14 +48,14 @@ export default function Home() {
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <div className="p-4 bg-primary/10 rounded-full">
-                      <Network className="w-8 h-8 text-primary" />
+                      <LinkIcon className="w-8 h-8 text-primary" />
                     </div>
                   </div>
-                  <CardTitle className="font-headline">Real-time Status</CardTitle>
+                  <CardTitle className="font-headline">2. Get a Secure Link</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Monitor your file transfer progress and view live logs as they happen.
+                    We generate a unique and secure link for your file, ready to be shared.
                   </p>
                 </CardContent>
               </Card>
@@ -69,11 +66,11 @@ export default function Home() {
                       <ShieldCheck className="w-8 h-8 text-primary" />
                     </div>
                   </div>
-                  <CardTitle className="font-headline">Secure & Reliable</CardTitle>
+                  <CardTitle className="font-headline">3. Share and Download</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    With fallback signed URLs, your file is always accessible even if the direct transfer fails.
+                   Anyone with the link can easily and securely download the file to their device.
                   </p>
                 </CardContent>
               </Card>

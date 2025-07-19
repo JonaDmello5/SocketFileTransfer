@@ -1,6 +1,6 @@
 'use client';
 
-import { FileTerminal, Menu } from 'lucide-react';
+import { Share2, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ThemeSwitcher } from './theme-switcher';
@@ -11,8 +11,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/setup', label: 'Setup Guide' },
+    { href: '/dashboard', label: 'Share File' },
   ];
 
   const NavContent = () => (
@@ -30,8 +29,8 @@ export default function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <FileTerminal className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block font-headline">SocketFileTransfer</span>
+            <Share2 className="h-6 w-6 text-primary" />
+            <span className="hidden font-bold sm:inline-block font-headline">SimpleShare</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <NavContent />
@@ -47,8 +46,8 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
             <Link href="/" className="mr-6 flex items-center space-x-2 mb-6">
-              <FileTerminal className="h-6 w-6 text-primary" />
-              <span className="font-bold font-headline">SocketFileTransfer</span>
+              <Share2 className="h-6 w-6 text-primary" />
+              <span className="font-bold font-headline">SimpleShare</span>
             </Link>
             <div className="flex flex-col space-y-3">
               <NavContent />

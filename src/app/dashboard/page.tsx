@@ -3,20 +3,17 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, File, X, Link as LinkIcon, AlertCircle, HelpCircle } from 'lucide-react';
+import { UploadCloud, File, X, Link as LinkIcon, AlertCircle, HelpCircle, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-type TransferStatus = 'idle' | 'uploading' | 'transferring' | 'completed' | 'failed';
+type TransferStatus = 'idle' | 'uploading' | 'completed' | 'failed';
 
 export default function DashboardPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [ipAddress, setIpAddress] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState<TransferStatus>('idle');
   const [progress, setProgress] = useState(0);
@@ -24,6 +21,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [shareableLink, setShareableLink] = useState('');
 
   const addLog = (message: string) => {
     setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -57,6 +55,7 @@ export default function DashboardPage() {
       setStatus('idle');
       setProgress(0);
       setLogs([]);
+      setShareableLink('');
     }
   };
   
@@ -68,7 +67,7 @@ export default function DashboardPage() {
       handleFileChange(event.dataTransfer.files[0]);
       event.dataTransfer.clearData();
     }
-  }, [toast]);
+  }, []);
 
   const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -84,21 +83,21 @@ export default function DashboardPage() {
 
   const resetState = () => {
     setFile(null);
-    setIpAddress('');
     setStatus('idle');
     setProgress(0);
     setLogs([]);
+    setShareableLink('');
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
   };
   
   const startTransfer = () => {
-    if (!file || !ipAddress.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)) {
+    if (!file) {
       toast({
         variant: 'destructive',
-        title: 'Invalid Input',
-        description: 'Please select a file and enter a valid IP address.',
+        title: 'No File Selected',
+        description: 'Please select a file to share.',
       });
       return;
     }
@@ -113,14 +112,12 @@ export default function DashboardPage() {
         const newProgress = prev + 10;
         if (newProgress >= 100) {
           clearInterval(intervalRef.current!);
-          if (status === 'uploading') {
-            addLog('File uploaded to temporary storage.');
-            setStatus('transferring');
-            startSocketTransfer();
-          } else {
-            addLog('File transfer complete.');
-            setStatus('completed');
-          }
+          addLog('File uploaded successfully.');
+          setStatus('completed');
+          // Dummy link generation
+          const newLink = `${window.location.origin}/download/${Date.now()}`;
+          setShareableLink(newLink);
+          addLog(`Shareable link created.`);
           return 100;
         }
         return newProgress;
@@ -128,29 +125,12 @@ export default function DashboardPage() {
     }, 200);
   };
   
-  const startSocketTransfer = () => {
-    setProgress(0);
-    addLog(`Initiating socket transfer to ${ipAddress}...`);
-    
-    intervalRef.current = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev + 5;
-        if (Math.random() > 0.95 && prev > 20 && prev < 80) { // Random failure
-           clearInterval(intervalRef.current!);
-           addLog(`Error: Connection to ${ipAddress} lost.`);
-           setStatus('failed');
-           return prev;
-        }
-        if (newProgress >= 100) {
-          clearInterval(intervalRef.current!);
-          addLog('File transfer complete.');
-          setStatus('completed');
-          return 100;
-        }
-        addLog(`Sent chunk... ${prev + 5}%`);
-        return newProgress;
-      });
-    }, 400);
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareableLink);
+    toast({
+      title: 'Link Copied!',
+      description: 'The shareable link has been copied to your clipboard.',
+    });
   };
 
   return (
@@ -159,8 +139,8 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline">New Transfer</CardTitle>
-              <CardDescription>Select a file and destination IP address.</CardDescription>
+              <CardTitle className="font-headline">Share a File</CardTitle>
+              <CardDescription>Upload a file to generate a shareable download link.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {!file ? (
@@ -193,23 +173,12 @@ export default function DashboardPage() {
                 </div>
               )}
               
-              <div className="space-y-2">
-                <Label htmlFor="ip-address">Destination IP Address</Label>
-                <Input
-                  id="ip-address"
-                  placeholder="e.g., 192.168.1.100"
-                  value={ipAddress}
-                  onChange={e => setIpAddress(e.target.value)}
-                  disabled={status === 'uploading' || status === 'transferring'}
-                />
-              </div>
-
               <Button
                 onClick={startTransfer}
-                disabled={!file || !ipAddress || status === 'uploading' || status === 'transferring'}
+                disabled={!file || status === 'uploading'}
                 className="w-full"
               >
-                Send File
+                {status === 'uploading' ? 'Uploading...' : 'Get Share Link'}
               </Button>
             </CardContent>
           </Card>
@@ -218,16 +187,16 @@ export default function DashboardPage() {
         <div className="lg:col-span-3">
           <Card className="h-full">
             <CardHeader>
-              <CardTitle className="font-headline">Transfer Status</CardTitle>
-              <CardDescription>Real-time progress and logs of your transfer.</CardDescription>
+              <CardTitle className="font-headline">Upload Status</CardTitle>
+              <CardDescription>Real-time progress of your file upload.</CardDescription>
             </CardHeader>
             <CardContent>
               {status === 'idle' && !file && (
                 <div className="text-center text-muted-foreground p-8 space-y-4">
                    <HelpCircle className="w-12 h-12 mx-auto text-muted-foreground/50"/>
                   <div>
-                    <p>Waiting for a new transfer to start.</p>
-                     <p className="text-sm">Need help? Check the <Button variant="link" className="p-0 h-auto"><Link href="/setup">Setup Guide</Link></Button> for the receiver script.</p>
+                    <p>Ready to share a file.</p>
+                     <p className="text-sm">Upload a file to get started.</p>
                   </div>
                 </div>
               )}
@@ -235,11 +204,10 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium">
-                      {status === 'uploading' && 'Uploading to cloud...'}
-                      {status === 'transferring' && `Transferring to ${ipAddress}...`}
-                      {status === 'completed' && 'Transfer Completed!'}
-                      {status === 'failed' && 'Transfer Failed.'}
-                      {(status === 'idle' && file) && 'Ready to transfer.'}
+                      {status === 'uploading' && 'Uploading...'}
+                      {status === 'completed' && 'Upload Complete!'}
+                      {status === 'failed' && 'Upload Failed.'}
+                      {(status === 'idle' && file) && 'Ready to upload.'}
                     </Label>
                     <Progress value={progress} className={cn('w-full mt-2', { 'progress-gradient': status !== 'failed' })} />
                   </div>
@@ -255,12 +223,17 @@ export default function DashboardPage() {
                   
                   {status === 'completed' && (
                     <Card className="bg-green-500/10 border-green-500/20">
-                      <CardContent className="p-4 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                              <LinkIcon className="w-5 h-5 text-primary"/>
-                              <p className="text-sm font-medium">As a fallback, your file is available at this secure link for 1 hour.</p>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2"><LinkIcon className="w-5 h-5 text-primary"/> Your file is ready to share!</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                          <p className="text-sm text-muted-foreground">Anyone with this link can download the file for the next 24 hours.</p>
+                          <div className="flex items-center gap-2">
+                            <Input value={shareableLink} readOnly className="bg-background"/>
+                            <Button variant="outline" size="icon" onClick={copyLink}>
+                              <Copy className="w-4 h-4"/>
+                            </Button>
                           </div>
-                          <Button variant="outline" size="sm">Copy Link</Button>
                       </CardContent>
                     </Card>
                   )}
@@ -269,14 +242,14 @@ export default function DashboardPage() {
                       <CardContent className="p-4 flex items-center gap-3">
                           <AlertCircle className="w-5 h-5 text-destructive"/>
                           <div>
-                            <p className="text-sm font-semibold text-destructive">The transfer could not be completed.</p>
-                            <p className="text-sm text-destructive/80">Please check the receiver status and try again.</p>
+                            <p className="text-sm font-semibold text-destructive">The upload could not be completed.</p>
+                            <p className="text-sm text-destructive/80">Please check your connection and try again.</p>
                           </div>
                       </CardContent>
                     </Card>
                   )}
                    {(status === 'completed' || status === 'failed') && (
-                     <Button onClick={resetState} variant="secondary" className="w-full">Start New Transfer</Button>
+                     <Button onClick={resetState} variant="secondary" className="w-full">Share Another File</Button>
                    )}
                 </div>
               )}

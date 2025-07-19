@@ -10,8 +10,8 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space
 const sourceCodePro = Source_Code_Pro({ subsets: ['latin'], variable: '--font-source-code-pro' });
 
 export const metadata: Metadata = {
-  title: 'SocketFileTransfer',
-  description: 'Securely transfer files over a TCP socket.',
+  title: 'SimpleShare',
+  description: 'Securely share files with a simple link.',
 };
 
 export default function RootLayout({
