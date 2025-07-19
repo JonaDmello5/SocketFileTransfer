@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Share2, Link as LinkIcon, ShieldCheck } from 'lucide-react';
+import { UploadCloud, KeySquare, DownloadCloud } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -13,11 +13,14 @@ export default function Home() {
               SimpleShare
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl mt-4">
-              Securely and efficiently share files with anyone, anywhere, using a simple link.
+              Securely and efficiently transfer files from one browser to another using a simple code.
             </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row justify-center">
               <Button asChild size="lg">
-                <Link href="/dashboard">Share a File</Link>
+                <Link href="/dashboard">Send a File</Link>
+              </Button>
+              <Button asChild size="lg" variant="secondary">
+                <Link href="/receive">Receive a File</Link>
               </Button>
             </div>
           </div>
@@ -33,14 +36,14 @@ export default function Home() {
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <div className="p-4 bg-primary/10 rounded-full">
-                      <Share2 className="w-8 h-8 text-primary" />
+                      <UploadCloud className="w-8 h-8 text-primary" />
                     </div>
                   </div>
                   <CardTitle className="font-headline">1. Upload Your File</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Select any file from your device. We'll handle the upload process for you.
+                    Select any file from your device to begin the transfer.
                   </p>
                 </CardContent>
               </Card>
@@ -48,14 +51,14 @@ export default function Home() {
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <div className="p-4 bg-primary/10 rounded-full">
-                      <LinkIcon className="w-8 h-8 text-primary" />
+                      <KeySquare className="w-8 h-8 text-primary" />
                     </div>
                   </div>
-                  <CardTitle className="font-headline">2. Get a Secure Link</CardTitle>
+                  <CardTitle className="font-headline">2. Share The Code</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    We generate a unique and secure link for your file, ready to be shared.
+                    Share the unique transfer code with your recipient.
                   </p>
                 </CardContent>
               </Card>
@@ -63,14 +66,14 @@ export default function Home() {
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <div className="p-4 bg-primary/10 rounded-full">
-                      <ShieldCheck className="w-8 h-8 text-primary" />
+                      <DownloadCloud className="w-8 h-8 text-primary" />
                     </div>
                   </div>
-                  <CardTitle className="font-headline">3. Share and Download</CardTitle>
+                  <CardTitle className="font-headline">3. Receive The File</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                   Anyone with the link can easily and securely download the file to their device.
+                   The recipient enters the code to download the file directly.
                   </p>
                 </CardContent>
               </Card>

@@ -11,7 +11,8 @@ export default function Header() {
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/dashboard', label: 'Share File' },
+    { href: '/dashboard', label: 'Send' },
+    { href: '/receive', label: 'Receive' },
   ];
 
   const NavContent = () => (
