@@ -4,19 +4,11 @@ import { FileTerminal, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { ThemeSwitcher } from './theme-switcher';
-import { useAuth } from '@/hooks/use-auth';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
-  const { user, signOut } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
-
-  const handleSignOut = () => {
-    signOut();
-    router.push('/');
-  };
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -66,15 +58,6 @@ export default function Header() {
         
         <div className="flex flex-1 items-center justify-end space-x-4">
           <ThemeSwitcher />
-          {user ? (
-            <Button onClick={handleSignOut} variant="outline">
-              Logout
-            </Button>
-          ) : (
-            <Button asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-          )}
         </div>
       </div>
     </header>

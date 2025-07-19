@@ -10,14 +10,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { UploadCloud, File, X, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
 
 type TransferStatus = 'idle' | 'uploading' | 'transferring' | 'completed' | 'failed';
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [ipAddress, setIpAddress] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -27,12 +23,6 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
 
   const addLog = (message: string) => {
     setLogs((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
@@ -161,14 +151,6 @@ export default function DashboardPage() {
       });
     }, 400);
   };
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-  
-  if (!user) {
-    return null;
-  }
 
   return (
     <div className="container mx-auto p-4 md:p-8">
