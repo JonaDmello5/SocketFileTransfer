@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DownloadCloud, File, AlertTriangle } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { DownloadCloud, File, AlertTriangle, User } from 'lucide-react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // This is a mock file details object. In a real application,
@@ -18,7 +18,10 @@ type FileDetails = typeof MOCK_FILE_DETAILS | null;
 
 export default function DownloadPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const fileId = params.fileId;
+  const recipient = searchParams.get('recipient');
+
   const [fileDetails, setFileDetails] = useState<FileDetails>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -66,6 +69,14 @@ export default function DownloadPage() {
                 </div>
             ) : fileDetails ? (
                 <div className="space-y-4">
+                    {recipient && (
+                        <div className="flex items-center gap-3 rounded-md border p-3 bg-muted/50 text-sm">
+                            <User className="h-5 w-5 text-muted-foreground" />
+                            <p className="text-muted-foreground">
+                                This file was shared with: <span className="font-semibold text-foreground">{decodeURIComponent(recipient)}</span>
+                            </p>
+                        </div>
+                    )}
                     <div className="flex items-start gap-4 p-4 border rounded-lg">
                         <File className="w-8 h-8 text-primary mt-1 flex-shrink-0" />
                         <div>

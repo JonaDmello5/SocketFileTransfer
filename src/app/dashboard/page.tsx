@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, File, X, Link as LinkIcon, AlertCircle, HelpCircle, Copy } from 'lucide-react';
+import { UploadCloud, File, X, Link as LinkIcon, AlertCircle, HelpCircle, Copy, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ type TransferStatus = 'idle' | 'uploading' | 'completed' | 'failed';
 
 export default function DashboardPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [recipientEmail, setRecipientEmail] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState<TransferStatus>('idle');
   const [progress, setProgress] = useState(0);
@@ -85,6 +86,7 @@ export default function DashboardPage() {
 
   const resetState = () => {
     setFile(null);
+    setRecipientEmail('');
     setStatus('idle');
     setProgress(0);
     setLogs([]);
@@ -117,7 +119,11 @@ export default function DashboardPage() {
           addLog('File uploaded successfully.');
           setStatus('completed');
           // Dummy link generation
-          const newLink = `${window.location.origin}/download/${Date.now()}`;
+          let newLink = `${window.location.origin}/download/${Date.now()}`;
+          if (recipientEmail) {
+            newLink += `?recipient=${encodeURIComponent(recipientEmail)}`;
+            addLog(`File is intended for ${recipientEmail}.`);
+          }
           setShareableLink(newLink);
           addLog(`Shareable link created.`);
           return 100;
@@ -142,7 +148,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">Share a File</CardTitle>
-              <CardDescription>Upload a file to generate a shareable download link.</CardDescription>
+              <CardDescription>Upload a file and specify a recipient to generate a shareable link.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {!file ? (
@@ -164,14 +170,33 @@ export default function DashboardPage() {
                   <input id="file-upload" type="file" className="hidden" onChange={e => handleFileChange(e.target.files?.[0] || null)} />
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <File className="w-6 h-6 text-primary" />
-                    <span className="text-sm font-medium truncate">{file.name}</span>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => setFile(null)}>
-                    <X className="w-4 h-4" />
-                  </Button>
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <File className="w-6 h-6 text-primary" />
+                        <span className="text-sm font-medium truncate">{file.name}</span>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => setFile(null)}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                </div>
+              )}
+
+              {file && (
+                <div className="space-y-2">
+                    <Label htmlFor="recipient-email">Recipient Email (Optional)</Label>
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                        <Input 
+                            id="recipient-email" 
+                            type="email" 
+                            placeholder="recipient@example.com" 
+                            value={recipientEmail}
+                            onChange={(e) => setRecipientEmail(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
                 </div>
               )}
               
@@ -229,7 +254,7 @@ export default function DashboardPage() {
                         <CardTitle className="text-lg flex items-center gap-2"><LinkIcon className="w-5 h-5 text-primary"/> Your file is ready to share!</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                          <p className="text-sm text-muted-foreground">Anyone with this link can download the file for the next 24 hours.</p>
+                          <p className="text-sm text-muted-foreground">Anyone with this link can download the file. {recipientEmail && `It is intended for ${recipientEmail}.`}</p>
                           <div className="flex items-center gap-2">
                             <Input value={shareableLink} readOnly className="bg-background"/>
                             <Button variant="outline" size="icon" onClick={copyLink}>
