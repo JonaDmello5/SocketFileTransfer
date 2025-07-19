@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, File, X, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { UploadCloud, File, X, Link as LinkIcon, AlertCircle, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 type TransferStatus = 'idle' | 'uploading' | 'transferring' | 'completed' | 'failed';
 
@@ -222,8 +223,12 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {status === 'idle' && !file && (
-                <div className="text-center text-muted-foreground p-8">
-                  <p>Waiting for a new transfer to start...</p>
+                <div className="text-center text-muted-foreground p-8 space-y-4">
+                   <HelpCircle className="w-12 h-12 mx-auto text-muted-foreground/50"/>
+                  <div>
+                    <p>Waiting for a new transfer to start.</p>
+                     <p className="text-sm">Need help? Check the <Button variant="link" className="p-0 h-auto"><Link href="/setup">Setup Guide</Link></Button> for the receiver script.</p>
+                  </div>
                 </div>
               )}
               {(status !== 'idle' || file) && (
