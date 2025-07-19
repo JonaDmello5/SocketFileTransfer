@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { UploadCloud, File, X, Link as LinkIcon, AlertCircle, HelpCircle, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 type TransferStatus = 'idle' | 'uploading' | 'completed' | 'failed';
 
